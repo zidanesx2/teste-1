@@ -27,6 +27,12 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -55,6 +61,7 @@
       <input type="text" id="linkGrupo" placeholder="Cole aqui o link do grupo WhatsApp" />
       <button onclick="enviarLinkGrupo()">Convidar Genos Bot</button>
       <p id="respostaBot" class="resposta"></p>
+      <button class="logout-btn" onclick="logout()">Sair</button>
     </div>
   </section>
 
@@ -63,16 +70,19 @@
   </footer>
 
   <script>
-    // Carrega a chave se já estiver salva
-    window.onload = () => {
+    window.onload = async () => {
       const chave = localStorage.getItem("apiKey");
       if (chave) {
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("adicionar").classList.remove("hidden");
+        const valida = await validarKeyComServidor(chave);
+        if (valida) {
+          mostrarTelaPrincipal();
+        } else {
+          localStorage.removeItem("apiKey");
+        }
       }
     };
 
-    function verificarChave() {
+    async function verificarChave() {
       const chave = document.getElementById("chaveAcesso").value.trim();
       const mensagem = document.getElementById("mensagemChave");
 
@@ -81,10 +91,42 @@
         return;
       }
 
-      localStorage.setItem("apiKey", chave);
-      mensagem.textContent = "";
+      mensagem.textContent = "🔎 Verificando chave...";
+
+      const valida = await validarKeyComServidor(chave);
+
+      if (valida) {
+        localStorage.setItem("apiKey", chave);
+        mensagem.textContent = "";
+        mostrarTelaPrincipal();
+      } else {
+        mensagem.textContent = "❌ Chave inválida. Verifique e tente novamente.";
+      }
+    }
+
+    async function validarKeyComServidor(key) {
+      try {
+        const res = await fetch("http://localhost:3000/validar-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key }),
+        });
+        const data = await res.json();
+        return data.valido === true;
+      } catch {
+        return false;
+      }
+    }
+
+    function mostrarTelaPrincipal() {
       document.getElementById("login").classList.add("hidden");
       document.getElementById("adicionar").classList.remove("hidden");
+    }
+
+    function logout() {
+      localStorage.removeItem("apiKey");
+      document.getElementById("adicionar").classList.add("hidden");
+      document.getElementById("login").classList.remove("hidden");
     }
 
     async function enviarLinkGrupo() {
@@ -113,7 +155,7 @@
         resposta.textContent = data.success
           ? "✅ Bot convidado com sucesso!"
           : "⚠️ Erro: " + (data.message || "Algo deu errado.");
-      } catch (err) {
+      } catch {
         resposta.textContent = "❌ Erro de conexão com o servidor.";
       }
     }
