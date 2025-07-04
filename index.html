@@ -91,147 +91,147 @@
   </footer>
 
   <script>
-    window.onload = async () => {
-      const chave = localStorage.getItem("apiKey");
-      if (chave) {
-        const valida = await validarKeyComServidor(chave);
-        if (valida) {
-          mostrarTelaPrincipal();
-        } else {
-          localStorage.removeItem("apiKey");
-        }
-      }
-    };
-
-    async function verificarChave() {
-      const chave = document.getElementById("chaveAcesso").value.trim();
-      const mensagem = document.getElementById("mensagemChave");
-
-      if (!chave) {
-        mensagem.textContent = "Digite uma chave para continuar.";
-        return;
-      }
-
-      mensagem.textContent = "🔎 Verificando chave...";
-
+  window.onload = async () => {
+    const chave = localStorage.getItem("apiKey");
+    if (chave) {
       const valida = await validarKeyComServidor(chave);
-
       if (valida) {
-        localStorage.setItem("apiKey", chave);
-        mensagem.textContent = "";
         mostrarTelaPrincipal();
       } else {
-        mensagem.textContent = "❌ Chave inválida. Verifique e tente novamente.";
+        localStorage.removeItem("apiKey");
       }
     }
+  };
 
-    async function validarKeyComServidor(key) {
-      try {
-        const res = await fetch("http://localhost:3000/validar-key", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key }),
-        });
-        const data = await res.json();
-        return data.valido === true;
-      } catch {
-        return false;
-      }
-    }
+  async function verificarChave() {
+    const chave = document.getElementById("chaveAcesso").value.trim();
+    const mensagem = document.getElementById("mensagemChave");
 
-    function mostrarTelaPrincipal() {
-      document.getElementById("login").classList.add("hidden");
-      document.getElementById("adicionar").classList.remove("hidden");
-    }
-
-    function logout() {
-      localStorage.removeItem("apiKey");
-      document.getElementById("adicionar").classList.add("hidden");
-      document.getElementById("login").classList.remove("hidden");
-    }
-
-    async function enviarLinkGrupo() {
-      const link = document.getElementById("linkGrupo").value.trim();
-      const resposta = document.getElementById("respostaBot");
-      const chave = localStorage.getItem("apiKey");
-
-      if (!link || !link.includes("chat.whatsapp.com/")) {
-        resposta.textContent = "❌ Link inválido. Cole um link de grupo do WhatsApp.";
-        return;
-      }
-
-      resposta.textContent = "⏳ Enviando convite...";
-
-      try {
-        const res = await fetch("http://localhost:3000/api/convidar-bot", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": chave,
-          },
-          body: JSON.stringify({ link }),
-        });
-
-        const data = await res.json();
-        resposta.textContent = data.success
-          ? "✅ Bot convidado com sucesso!"
-          : "⚠️ Erro: " + (data.message || "Algo deu errado.");
-      } catch {
-        resposta.textContent = "❌ Erro de conexão com o servidor.";
-      }
-    }
-    
-  async function gerarPagamento() {
-  const qrCodeImg = document.getElementById("qrCodeImg");
-  const chavePix = document.getElementById("chavePix");
-  const qrcodeContainer = document.getElementById("qrcodeContainer");
-  const apiKeyContainer = document.getElementById("apiKeyContainer");
-  const apiKeyGerada = document.getElementById("apiKeyGerada");
-
-  try {
-    const response = await fetch("http://localhost:3000/gerar-pagamento");
-    const data = await response.json();
-
-    console.log("🚀 Pagamento gerado:", data);
-
-    if (!data.codigoPix || !data.qrCodeBase64) {
-      alert("❌ Erro ao gerar QR Code. Dados incompletos.");
+    if (!chave) {
+      mensagem.textContent = "Digite uma chave para continuar.";
       return;
     }
 
-    qrCodeImg.src = data.qrCodeBase64;
-    chavePix.textContent = data.codigoPix;
-    qrcodeContainer.classList.remove("hidden");
+    mensagem.textContent = "🔎 Verificando chave...";
 
-    const idPagamento = data.idPagamento;
+    const valida = await validarKeyComServidor(chave);
 
-    const interval = setInterval(async () => {
-      const check = await fetch("http://localhost:3000/verificar-pagamento", {
+    if (valida) {
+      localStorage.setItem("apiKey", chave);
+      mensagem.textContent = "";
+      mostrarTelaPrincipal();
+    } else {
+      mensagem.textContent = "❌ Chave inválida. Verifique e tente novamente.";
+    }
+  }
+
+  async function validarKeyComServidor(key) {
+    try {
+      const res = await fetch("http://localhost:3000/validar-key", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idPagamento })
+        body: JSON.stringify({ key }),
+      });
+      const data = await res.json();
+      return data.valido === true;
+    } catch {
+      return false;
+    }
+  }
+
+  function mostrarTelaPrincipal() {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("adicionar").classList.remove("hidden");
+  }
+
+  function logout() {
+    localStorage.removeItem("apiKey");
+    document.getElementById("adicionar").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+  }
+
+  async function enviarLinkGrupo() {
+    const link = document.getElementById("linkGrupo").value.trim();
+    const resposta = document.getElementById("respostaBot");
+    const chave = localStorage.getItem("apiKey");
+
+    if (!link || !link.includes("chat.whatsapp.com/")) {
+      resposta.textContent = "❌ Link inválido. Cole um link de grupo do WhatsApp.";
+      return;
+    }
+
+    resposta.textContent = "⏳ Enviando convite...";
+
+    try {
+      const res = await fetch("http://localhost:3000/api/convidar-bot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": chave,
+        },
+        body: JSON.stringify({ link }),
       });
 
-      const checkData = await check.json();
-
-      if (checkData.success === true) {
-        clearInterval(interval);
-        qrcodeContainer.classList.add("hidden");
-        apiKeyContainer.classList.remove("hidden");
-        apiKeyGerada.value = checkData.apiKey;
-        console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
-      }
-    }, 5000);
-
-  } catch (error) {
-    alert("❌ Erro ao gerar pagamento Pix.");
-    console.error(error);
+      const data = await res.json();
+      resposta.textContent = data.success
+        ? "✅ Bot convidado com sucesso!"
+        : "⚠️ Erro: " + (data.message || "Algo deu errado.");
+    } catch {
+      resposta.textContent = "❌ Erro de conexão com o servidor.";
+    }
   }
-}
 
+  async function gerarPagamento() {
+    const qrCodeImg = document.getElementById("qrCodeImg");
+    const chavePix = document.getElementById("chavePix");
+    const qrcodeContainer = document.getElementById("qrcodeContainer");
+    const apiKeyContainer = document.getElementById("apiKeyContainer");
+    const apiKeyGerada = document.getElementById("apiKeyGerada");
 
+    try {
+      const response = await fetch("http://localhost:3000/gerar-pagamento", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      });
 
+      const data = await response.json();
+      console.log("🚀 Pagamento gerado:", data);
 
-  </script>
-</body>
-</html>
+      if (!data.codigoPix || !data.qrCodeBase64) {
+        alert("❌ Erro ao gerar QR Code. Dados incompletos.");
+        return;
+      }
+
+      qrCodeImg.src = data.qrCodeBase64;
+      chavePix.textContent = data.codigoPix;
+      qrcodeContainer.classList.remove("hidden");
+
+      const interval = setInterval(async () => {
+        const check = await fetch("http://localhost:3000/verificar-pagamento", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ idPagamento: data.idPagamento })
+        });
+
+        const checkData = await check.json();
+
+        if (checkData.success === true) {
+          clearInterval(interval);
+          qrcodeContainer.classList.add("hidden");
+          apiKeyContainer.classList.remove("hidden");
+          apiKeyGerada.value = checkData.apiKey;
+          console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
+        }
+      }, 5000);
+
+    } catch (error) {
+      alert("❌ Erro ao gerar pagamento Pix.");
+      console.error(error);
+    }
+  }
+</script>
