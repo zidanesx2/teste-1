@@ -6,9 +6,7 @@
   <title>Genos Bot - Seu Assistente no WhatsApp</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
     .container {
       max-width: 500px;
       margin: 0 auto;
@@ -24,6 +22,10 @@
     #mensagemChave {
       color: red;
       margin-top: 5px;
+    }
+    .resposta {
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -46,7 +48,7 @@
     </div>
   </section>
 
-  <!-- ✅ Tela principal (inicialmente escondida) -->
+  <!-- ✅ Tela principal -->
   <section class="section destaque hidden" id="adicionar">
     <div class="container">
       <h2>➕ Adicione o Bot ao Seu Grupo</h2>
@@ -61,7 +63,7 @@
   </footer>
 
   <script>
-    // Verifica se já tem chave salva no localStorage
+    // Carrega a chave se já estiver salva
     window.onload = () => {
       const chave = localStorage.getItem("apiKey");
       if (chave) {
@@ -79,16 +81,14 @@
         return;
       }
 
-      // Salva a chave no navegador
       localStorage.setItem("apiKey", chave);
-
-      // Oculta login e mostra o formulário
+      mensagem.textContent = "";
       document.getElementById("login").classList.add("hidden");
       document.getElementById("adicionar").classList.remove("hidden");
     }
 
     async function enviarLinkGrupo() {
-      const link = document.getElementById("linkGrupo").value;
+      const link = document.getElementById("linkGrupo").value.trim();
       const resposta = document.getElementById("respostaBot");
       const chave = localStorage.getItem("apiKey");
 
@@ -112,8 +112,8 @@
         const data = await res.json();
         resposta.textContent = data.success
           ? "✅ Bot convidado com sucesso!"
-          : "⚠️ Erro: " + data.message;
-      } catch {
+          : "⚠️ Erro: " + (data.message || "Algo deu errado.");
+      } catch (err) {
         resposta.textContent = "❌ Erro de conexão com o servidor.";
       }
     }
