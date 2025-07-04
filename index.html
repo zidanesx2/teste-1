@@ -180,6 +180,49 @@
         resposta.textContent = "❌ Erro de conexão com o servidor.";
       }
     }
+    async function gerarPagamento() {
+  const qrCodeImg = document.getElementById("qrCodeImg");
+  const chavePix = document.getElementById("chavePix");
+  const qrcodeContainer = document.getElementById("qrcodeContainer");
+  const apiKeyContainer = document.getElementById("apiKeyContainer");
+  const apiKeyGerada = document.getElementById("apiKeyGerada");
+
+  try {
+    const response = await fetch("http://localhost:3000/gerar-pagamento");
+    const data = await response.json();
+
+    console.log("🚀 Pagamento gerado:", data); // ✅ Aqui o log útil!
+
+    if (!data.qr_code || !data.qr_code_base64) {
+      alert("❌ Erro ao gerar QR Code. Dados incompletos.");
+      return;
+    }
+
+    qrCodeImg.src = data.qr_code_base64;
+    chavePix.textContent = data.qr_code;
+    qrcodeContainer.classList.remove("hidden");
+
+    const interval = setInterval(async () => {
+      const check = await fetch(`http://localhost:3000/verificar-pagamento?id=${data.id}`);
+      const checkData = await check.json();
+
+      if (checkData.status === "approved") {
+        clearInterval(interval);
+        qrcodeContainer.classList.add("hidden");
+        apiKeyContainer.classList.remove("hidden");
+        apiKeyGerada.value = checkData.apiKey;
+        console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
+      }
+    }, 5000);
+
+  } catch (error) {
+    alert("❌ Erro ao gerar pagamento Pix.");
+    console.error(error);
+  }
+}
+
+
+
   </script>
 </body>
 </html>
