@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Genos Bot - Seu Assistente no WhatsApp</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden {
+      display: none;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    #mensagemChave {
+      color: red;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <header class="hero">
@@ -15,17 +36,18 @@
     </div>
   </header>
 
-  <section class="section about">
+  <!-- 🔐 Tela de login -->
+  <section id="login" class="section destaque">
     <div class="container">
-      <h2>O que é o Genos Bot?</h2>
-      <p>
-        Genos Bot é uma solução moderna para automatizar vendas e atendimentos no WhatsApp.
-        Perfeito para quem quer economizar tempo e vender mais!
-      </p>
+      <h2>🔐 Acesso com API Key</h2>
+      <input type="text" id="chaveAcesso" placeholder="Digite sua API Key" />
+      <button onclick="verificarChave()">Entrar</button>
+      <p id="mensagemChave"></p>
     </div>
   </section>
 
-  <section class="section destaque" id="adicionar">
+  <!-- ✅ Tela principal (inicialmente escondida) -->
+  <section class="section destaque hidden" id="adicionar">
     <div class="container">
       <h2>➕ Adicione o Bot ao Seu Grupo</h2>
       <input type="text" id="linkGrupo" placeholder="Cole aqui o link do grupo WhatsApp" />
@@ -39,9 +61,36 @@
   </footer>
 
   <script>
+    // Verifica se já tem chave salva no localStorage
+    window.onload = () => {
+      const chave = localStorage.getItem("apiKey");
+      if (chave) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("adicionar").classList.remove("hidden");
+      }
+    };
+
+    function verificarChave() {
+      const chave = document.getElementById("chaveAcesso").value.trim();
+      const mensagem = document.getElementById("mensagemChave");
+
+      if (!chave) {
+        mensagem.textContent = "Digite uma chave para continuar.";
+        return;
+      }
+
+      // Salva a chave no navegador
+      localStorage.setItem("apiKey", chave);
+
+      // Oculta login e mostra o formulário
+      document.getElementById("login").classList.add("hidden");
+      document.getElementById("adicionar").classList.remove("hidden");
+    }
+
     async function enviarLinkGrupo() {
       const link = document.getElementById("linkGrupo").value;
       const resposta = document.getElementById("respostaBot");
+      const chave = localStorage.getItem("apiKey");
 
       if (!link || !link.includes("chat.whatsapp.com/")) {
         resposta.textContent = "❌ Link inválido. Cole um link de grupo do WhatsApp.";
@@ -53,7 +102,10 @@
       try {
         const res = await fetch("http://localhost:3000/api/convidar-bot", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": chave,
+          },
           body: JSON.stringify({ link }),
         });
 
