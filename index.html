@@ -65,6 +65,27 @@
     </div>
   </section>
 
+  <!-- 💳 Comprar nova API Key via Pix -->
+<section id="comprarKey" class="section destaque">
+  <div class="container">
+    <h2>💳 Obter Nova API Key</h2>
+    <p>Realize o pagamento via Pix para receber uma chave de acesso ao Genos Bot.</p>
+    <button onclick="gerarPagamento()">Gerar QR Code Pix</button>
+
+    <div id="qrcodeContainer" class="hidden">
+      <p>📷 Escaneie com seu app bancário:</p>
+      <img id="qrCodeImg" src="" alt="QR Code Pix" style="max-width: 300px; margin: auto;" />
+      <p id="chavePix" style="word-break: break-all;"></p>
+    </div>
+
+    <div id="apiKeyContainer" class="hidden">
+      <p>🔑 Sua nova API Key:</p>
+      <input id="apiKeyGerada" readonly style="font-weight: bold;" />
+    </div>
+  </div>
+</section>
+
+
   <footer>
     <p>© 2025 Genos Bot · Desenvolvido por Anthony</p>
   </footer>
