@@ -205,29 +205,30 @@
         return;
       }
 
-      qrCodeImg.src = data.qrCodeBase64;
-      chavePix.textContent = data.codigoPix;
-      qrcodeContainer.classList.remove("hidden");
+      qrCodeImg.src = "data:image/png;base64," + data.qrCodeBase64;
+chavePix.textContent = data.codigoPix;
+qrcodeContainer.classList.remove("hidden");
 
-      const interval = setInterval(async () => {
-        const check = await fetch("http://localhost:3000/verificar-pagamento", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ idPagamento: data.idPagamento })
-        });
+const interval = setInterval(async () => {
+  const check = await fetch("http://localhost:3000/verificar-pagamento", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ idPagamento: data.idPagamento })
+  });
 
-        const checkData = await check.json();
+  const checkData = await check.json();
 
-        if (checkData.success === true) {
-          clearInterval(interval);
-          qrcodeContainer.classList.add("hidden");
-          apiKeyContainer.classList.remove("hidden");
-          apiKeyGerada.value = checkData.apiKey;
-          console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
-        }
-      }, 5000);
+  if (checkData.success === true) {
+    clearInterval(interval);
+    qrcodeContainer.classList.add("hidden");
+    apiKeyContainer.classList.remove("hidden");
+    apiKeyGerada.value = checkData.apiKey;
+    console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
+  }
+}, 5000);
+
 
     } catch (error) {
       alert("❌ Erro ao gerar pagamento Pix.");
