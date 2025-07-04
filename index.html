@@ -180,7 +180,8 @@
         resposta.textContent = "❌ Erro de conexão com o servidor.";
       }
     }
-    async function gerarPagamento() {
+    
+  async function gerarPagamento() {
   const qrCodeImg = document.getElementById("qrCodeImg");
   const chavePix = document.getElementById("chavePix");
   const qrcodeContainer = document.getElementById("qrcodeContainer");
@@ -191,22 +192,29 @@
     const response = await fetch("http://localhost:3000/gerar-pagamento");
     const data = await response.json();
 
-    console.log("🚀 Pagamento gerado:", data); // ✅ Aqui o log útil!
+    console.log("🚀 Pagamento gerado:", data);
 
-    if (!data.qr_code || !data.qr_code_base64) {
+    if (!data.codigoPix || !data.qrCodeBase64) {
       alert("❌ Erro ao gerar QR Code. Dados incompletos.");
       return;
     }
 
-    qrCodeImg.src = data.qr_code_base64;
-    chavePix.textContent = data.qr_code;
+    qrCodeImg.src = data.qrCodeBase64;
+    chavePix.textContent = data.codigoPix;
     qrcodeContainer.classList.remove("hidden");
 
+    const idPagamento = data.idPagamento;
+
     const interval = setInterval(async () => {
-      const check = await fetch(`http://localhost:3000/verificar-pagamento?id=${data.id}`);
+      const check = await fetch("http://localhost:3000/verificar-pagamento", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idPagamento })
+      });
+
       const checkData = await check.json();
 
-      if (checkData.status === "approved") {
+      if (checkData.success === true) {
         clearInterval(interval);
         qrcodeContainer.classList.add("hidden");
         apiKeyContainer.classList.remove("hidden");
@@ -220,6 +228,7 @@
     console.error(error);
   }
 }
+
 
 
 
