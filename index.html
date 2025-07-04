@@ -1,40 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Metadados para WhatsApp e redes sociais -->
-    <meta property="og:title" content="GENOS">
-    <meta property="og:description" content="Olá Anthony, comando não existente no sistema...">
-    <meta property="og:image" content="https://zidanesx2.github.io/meu-site2/imagens/aluguel.jpg?v=2">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://zidanesx2.github.io/meu-site2/">
-    <meta property="og:type" content="website">
-
-    <!-- Meta para Twitter (compatível com WhatsApp) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GENOS">
-    <meta name="twitter:description" content="Olá Anthony, comando não existente no sistema...">
-    <meta name="twitter:image" content="https://zidanesx2.github.io/meu-site2/imagens/aluguel.jpg?v=2">
-
-    <title>Meu Site</title>
-    <!-- Conectando o CSS -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Genos Bot - Seu Assistente no WhatsApp</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Bem-vindo ao Meu Site!</h1>
-    <p>Esta é uma página de informações e pagamentos do Genos Bot.</p>
-
-    <img src="aluguel.jpg" alt="Imagem de Capa" width="100%">
-
-    <!-- Botão centralizado -->
-    <div class="botao-container">
-        <a href="info.html" class="botao-link">Acessar Informações</a>
+  <header class="hero">
+    <div class="hero-content">
+      <h1>🤖 GENOS BOT V2</h1>
+      <p>Seu assistente automatizado de vendas via WhatsApp</p>
+      <a href="#adicionar" class="btn-primary">Adicionar ao Grupo</a>
     </div>
+  </header>
 
-    <!-- Conectando o JavaScript -->
-    <script src="script.js"></script>
+  <section class="section about">
+    <div class="container">
+      <h2>O que é o Genos Bot?</h2>
+      <p>
+        Genos Bot é uma solução moderna para automatizar vendas e atendimentos no WhatsApp.
+        Perfeito para quem quer economizar tempo e vender mais!
+      </p>
+    </div>
+  </section>
+
+  <section class="section destaque" id="adicionar">
+    <div class="container">
+      <h2>➕ Adicione o Bot ao Seu Grupo</h2>
+      <input type="text" id="linkGrupo" placeholder="Cole aqui o link do grupo WhatsApp" />
+      <button onclick="enviarLinkGrupo()">Convidar Genos Bot</button>
+      <p id="respostaBot" class="resposta"></p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Genos Bot · Desenvolvido por Anthony</p>
+  </footer>
+
+  <script>
+    async function enviarLinkGrupo() {
+      const link = document.getElementById("linkGrupo").value;
+      const resposta = document.getElementById("respostaBot");
+
+      if (!link || !link.includes("chat.whatsapp.com/")) {
+        resposta.textContent = "❌ Link inválido. Cole um link de grupo do WhatsApp.";
+        return;
+      }
+
+      resposta.textContent = "⏳ Enviando convite...";
+
+      try {
+        const res = await fetch("https://seuservidor.com/api/convidar-bot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ link }),
+        });
+
+        const data = await res.json();
+        resposta.textContent = data.success
+          ? "✅ Bot convidado com sucesso!"
+          : "⚠️ Erro: " + data.message;
+      } catch {
+        resposta.textContent = "❌ Erro de conexão com o servidor.";
+      }
+    }
+  </script>
 </body>
 </html>
