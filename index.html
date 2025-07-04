@@ -51,7 +51,7 @@
       resposta.textContent = "⏳ Enviando convite...";
 
       try {
-        const res = await fetch("https://seuservidor.com/api/convidar-bot", {
+        const res = await fetch("http://localhost:3000/api/convidar-bot", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ link }),
