@@ -20,6 +20,8 @@ async function convidarBot() {
       body: JSON.stringify({ link }),
     });
 
+// Erro de Conexão com o Servidor.
+
     const data = await response.json();
     respostaEl.innerText = data.message || "⚠️ Algo aconteceu!";
   } catch (error) {
