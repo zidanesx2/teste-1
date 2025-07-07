@@ -210,41 +210,16 @@
       const data = await response.json();
       console.log("🚀 Pagamento gerado:", data);
 
-      if (!data.codigoPix || !data.qrCodeBase64) {
+      if (!data.qrCode || !data.imagem) {
         alert("❌ Erro ao gerar QR Code. Dados incompletos ou inválidos.");
         btnPagamento.disabled = false;
         btnPagamento.textContent = "Gerar QR Code Pix";
         return;
       }
 
-      qrCodeImg.src = "data:image/png;base64," + data.qrCodeBase64;
-      chavePix.textContent = data.codigoPix;
+      qrCodeImg.src = data.imagem;
+      chavePix.textContent = data.qrCode;
       qrcodeContainer.classList.remove("hidden");
-
-      // Verificar pagamento a cada 5 segundos
-      const interval = setInterval(async () => {
-        try {
-          const check = await fetch(`${API_BASE}/verificar-pagamento`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ idPagamento: data.idPagamento })
-          });
-
-          const checkData = await check.json();
-
-          if (checkData.success === true) {
-            clearInterval(interval);
-            qrcodeContainer.classList.add("hidden");
-            apiKeyContainer.classList.remove("hidden");
-            apiKeyGerada.value = checkData.apiKey;
-            console.log("✅ Pagamento aprovado! API Key:", checkData.apiKey);
-          }
-        } catch (e) {
-          console.error("Erro ao verificar pagamento:", e);
-        }
-      }, 5000);
 
     } catch (error) {
       alert("❌ Erro ao gerar pagamento Pix.");
