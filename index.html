@@ -66,34 +66,32 @@
   </section>
 
   <!-- 💳 Comprar nova API Key via Pix -->
-<section id="comprarKey" class="section destaque">
-  <div class="container">
-    <h2>💳 Obter Nova API Key</h2>
-    <p>Realize o pagamento via Pix para receber uma chave de acesso ao Genos Bot.</p>
-    <button onclick="gerarPagamento()">Gerar QR Code Pix</button>
+  <section id="comprarKey" class="section destaque">
+    <div class="container">
+      <h2>💳 Obter Nova API Key</h2>
+      <p>Realize o pagamento via Pix para receber uma chave de acesso ao Genos Bot.</p>
+      <button onclick="gerarPagamento()" id="btnPagamento">Gerar QR Code Pix</button>
 
-    <div id="qrcodeContainer" class="hidden">
-      <p>📷 Escaneie com seu app bancário:</p>
-      <img id="qrCodeImg" src="" alt="QR Code Pix" style="max-width: 300px; margin: auto;" />
-      <p id="chavePix" style="word-break: break-all;"></p>
+      <div id="qrcodeContainer" class="hidden">
+        <p>📷 Escaneie com seu app bancário:</p>
+        <img id="qrCodeImg" src="" alt="QR Code Pix" style="max-width: 300px; margin: auto;" />
+        <p id="chavePix" style="word-break: break-all;"></p>
+        <p><strong>⏳ Aguardando pagamento...</strong></p>
+      </div>
+
+      <div id="apiKeyContainer" class="hidden">
+        <p>🔑 Sua nova API Key:</p>
+        <input id="apiKeyGerada" readonly style="font-weight: bold;" />
+      </div>
     </div>
-
-    <div id="apiKeyContainer" class="hidden">
-      <p>🔑 Sua nova API Key:</p>
-      <input id="apiKeyGerada" readonly style="font-weight: bold;" />
-    </div>
-  </div>
-</section>
-
+  </section>
 
   <footer>
     <p>© 2025 Genos Bot · Desenvolvido por Anthony</p>
   </footer>
 
-  <script>
-  // Altere aqui para o endereço do seu backend (ex: ngrok ou servidor VPS)
- const API_BASE = 'http://localhost:3000';
-
+<script>
+  const API_BASE = 'http://localhost:3000';
 
   window.onload = async () => {
     const chave = localStorage.getItem("apiKey");
@@ -195,6 +193,10 @@
     const qrcodeContainer = document.getElementById("qrcodeContainer");
     const apiKeyContainer = document.getElementById("apiKeyContainer");
     const apiKeyGerada = document.getElementById("apiKeyGerada");
+    const btnPagamento = document.getElementById("btnPagamento");
+
+    btnPagamento.disabled = true;
+    btnPagamento.textContent = "⏳ Gerando pagamento...";
 
     try {
       const response = await fetch(`${API_BASE}/gerar-pagamento`, {
@@ -210,6 +212,8 @@
 
       if (!data.codigoPix || !data.qrCodeBase64) {
         alert("❌ Erro ao gerar QR Code. Dados incompletos ou inválidos.");
+        btnPagamento.disabled = false;
+        btnPagamento.textContent = "Gerar QR Code Pix";
         return;
       }
 
@@ -245,6 +249,12 @@
     } catch (error) {
       alert("❌ Erro ao gerar pagamento Pix.");
       console.error("Erro ao gerar pagamento:", error);
+    } finally {
+      btnPagamento.disabled = false;
+      btnPagamento.textContent = "Gerar QR Code Pix";
     }
   }
 </script>
+
+</body>
+</html>
